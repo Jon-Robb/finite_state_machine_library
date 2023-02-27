@@ -24,7 +24,7 @@ class State:
             if not transition.is_valid():
                 all_transitions_are_valid = False
                 break
-        return len(self.__transition) > 0 and all_transitions_are_valid
+        return self.__transition and all_transitions_are_valid
     
     @property
     def is_terminal(self) -> bool:

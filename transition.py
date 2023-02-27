@@ -12,7 +12,7 @@ class Transition:
 
     @property
     def is_valid(self)-> bool:
-        return self.next_state.is_valid
+        return self.next_state
     
     @next_state.setter
     def next_state(self, state:"State")->None:
