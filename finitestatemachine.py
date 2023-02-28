@@ -23,12 +23,8 @@ class FiniteStateMachine:
             
         @property
         def is_valid(self) -> bool:
-            valid = True
-            for state in self.__states:
-                if not state.is_valid():
-                    valid = False
-                    break
-            return valid and self.initial_state.is_valid
+            return all(self.__states) and self.initial_state
+
         
         def add_state(self, state:State):
             if not isinstance(state, State):
