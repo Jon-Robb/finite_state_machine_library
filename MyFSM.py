@@ -6,14 +6,6 @@ class MyFSM(FiniteStateMachine):
         
         layout = FiniteStateMachine.Layout()
         
-        # Add states to the layout here
-        # -------------------------------------------------------------------------------------
-        # layout.add_state("State1", self.enter_state1, self.exit_state1, self.update_state1)
-        # self.add_state("State2", self.enter_state2, self.exit_state2, self.update_state2)
-        # self.add_transition("State1", "State2", self.transition1)
-        # self.add_transition("State2", "State1", self.transition2)
-        # self.set_start("State1")
-        
         super().__init__(layout)
         
     def enter_state1(self):
@@ -41,3 +33,12 @@ class MyFSM(FiniteStateMachine):
     def transition2(self):
         print("transitioning from state 2 to state 1")
         return True
+    
+ # Add states to the layout here
+        # -------------------------------------------------------------------------------------
+        # layout.add_state("State1", self.enter_state1, self.exit_state1, self.update_state1)
+        # self.add_state("State2", self.enter_state2, self.exit_state2, self.update_state2)
+        # self.add_transition("State1", "State2", self.transition1)
+        # self.add_transition("State2", "State1", self.transition2)
+        # self.set_start("State1")
+        
