@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from transition import Transition
+# if TYPE_CHECKING:
+from transition import Transition
 
 
 class State:
@@ -52,7 +52,7 @@ class State:
             The parameters for this state, by default an empty Parameters object.
         """
         self.__parameters = parameters
-        self.__transition = []
+        self.__transitions = []
 
     @property
     def is_valid(self) -> bool:
@@ -64,12 +64,7 @@ class State:
         bool:
             Whether this state is valid or not.
         """
-        all_transitions_are_valid = True
-        for transition in self.__transition:
-            if not transition.is_valid():
-                all_transitions_are_valid = False
-                break
-        return self.__transition and all_transitions_are_valid
+        return self.__transitions and all(transition.is_valid for transition in self.__transitions)
     
     @property
     def is_terminal(self) -> bool:
@@ -93,7 +88,7 @@ class State:
         Transition:
             The current transition for this state, or None if there is no current transition.
         """
-        pass
+        return self.__transitions
 
     def add_transition(self, transition: "Transition") -> None:
         """
@@ -111,43 +106,47 @@ class State:
         """
         if not isinstance(transition, Transition):
             raise TypeError("transition must be of type Transition")
-        self.__transition.append(transition)
+        self.__transitions.append(transition)
         
         
     def _exec_entering_action(self) -> None:
         """
         Executes the entering action for this state.
         """
+        self._do_entering_action()        
         print("_exec_entering_action")
 
     def _exec_in_state_action(self) -> None:
         """
         Executes the in-state action for this state.
         """
+        self._do_in_state_action()
         print("_exec_in_state_action")
     
     def _exec_exiting_action(self) -> None:
         """
         Executes the exiting action for this state.
         """
+        self._do_exiting_action()
         print("_exec_exiting_action")
 
     def _do_entering_action(self) -> None:
         """
         Does the entering action for this state.
         """
-        print("_do_entering_action")
+        raise NotImplementedError("_do_entering_action must be implemented.")
 
     def _do_in_state_action(self) -> None:
         """
         Does the in-state action for this state.
         """
-        print("_do_in_state_action")
+        raise NotImplementedError("_do_in_state_action must be implemented.")
 
     def _do_exiting_action(self) -> None:
         """
         Does the exiting action for this state.
         """
+        raise NotImplementedError("_do_exiting_action must be implemented.")
         print("_do_exiting_action")
 
 
