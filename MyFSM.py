@@ -1,10 +1,10 @@
-from FiniteStateMachine import FiniteStateMachine
-
+from finite_state_machine import FiniteStateMachine
 class MyFSM(FiniteStateMachine):
     def __init__(self):
         
         
         layout = FiniteStateMachine.Layout()
+        
         
         super().__init__(layout)
         
