@@ -100,44 +100,44 @@ class FiniteStateMachine:
             """
             Returns True if the layout is valid, i.e. it contains all states and an initial state.
             """
-            return all(self.__states        ) and self.initial_state
+            return all(self.__states) and self.initial_state
 
     
-    def add_state(self, state:State) -> None:
-        """
-        Adds the given state to the list of states in the finite state machine.
+        def add_state(self, state:State) -> None:
+            """
+            Adds the given state to the list of states in the finite state machine.
 
-        Parameters:
-        -----------
-        state : State
-            The state to add to the list of states in the finite state machine.
+            Parameters:
+            -----------
+            state : State
+                The state to add to the list of states in the finite state machine.
 
-        Raises:
-        -------
-        TypeError:
-            If the given state is not of type State.
-        """
-        if not isinstance(state, State):
-            raise TypeError("State must be of type State")
-        self.__states.append(state)
-        
-    def add_states(self, states:list[State]) -> None:
-        """
-        Adds the given list of states to the list of states in the finite state machine.
+            Raises:
+            -------
+            TypeError:
+                If the given state is not of type State.
+            """
+            if not isinstance(state, State):
+                raise TypeError("State must be of type State")
+            self.__states.append(state)
+            
+        def add_states(self, states:list[State]) -> None:
+            """
+            Adds the given list of states to the list of states in the finite state machine.
 
-        Parameters:
-        -----------
-        states : list[State]
-            The list of states to add to the list of states in the finite state machine.
+            Parameters:
+            -----------
+            states : list[State]
+                The list of states to add to the list of states in the finite state machine.
 
-        Raises:
-        -------
-        TypeError:
-            If the given list of states is not of type list of State.
-        """
-        if not isinstance(states, list[State]):
-            raise TypeError("States must be of type list of State")
-        self.__states.extend(states)
+            Raises:
+            -------
+            TypeError:
+                If the given list of states is not of type list of State.
+            """
+            if not isinstance(states, list[State]):
+                raise TypeError("States must be of type list of State")
+            self.__states.extend(states)
    
     class OperationalState(Enum):
         """
