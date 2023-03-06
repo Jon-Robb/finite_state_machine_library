@@ -5,4 +5,7 @@ if __name__ == '__main__':
     fsm = FiniteStateMachine(layout=layout , unitialized=False)
     fsm.run()
     
+    # list = [1,2,3, 3,3,3,3,3, 4,5]
+    # print(next((x for x in list if x == 3), None))
+    
     

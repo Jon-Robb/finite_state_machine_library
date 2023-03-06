@@ -1,14 +1,16 @@
 from finite_state_machine import FiniteStateMachine
+from finite_state_machine import State
 class MyFSM(FiniteStateMachine):
     def __init__(self):
         
         
         layout = FiniteStateMachine.Layout()
-        
+        layout.add_states(State(), State(), State())
         
         super().__init__(layout)
         
     def enter_state1(self):
+        
         print("entering state 1")
 
     def exit_state1(self):

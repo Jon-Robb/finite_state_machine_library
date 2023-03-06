@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-# if TYPE_CHECKING:
+#if TYPE_CHECKING:
 from transition import Transition
 
 
@@ -88,7 +88,7 @@ class State:
         Transition:
             The current transition for this state, or None if there is no current transition.
         """
-        return self.__transitions
+        return next((transition for transition in self.__transitions if transition.is_transiting), None)
 
     def add_transition(self, transition: "Transition") -> None:
         """
@@ -104,6 +104,7 @@ class State:
         TypeError:
             If the given transition is not of type Transition.
         """
+        # if  type(transition) is not Transition:
         if not isinstance(transition, Transition):
             raise TypeError("transition must be of type Transition")
         self.__transitions.append(transition)
@@ -127,8 +128,10 @@ class State:
         """
         Executes the exiting action for this state.
         """
+        if self.__parameters.do_in_state_action_when_exiting:
+            self._exec_in_state_action()
+            
         self._do_exiting_action()
-        print("_exec_exiting_action")
 
     def _do_entering_action(self) -> None:
         """

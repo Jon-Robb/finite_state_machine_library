@@ -1,8 +1,9 @@
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from state import State
 
-class Transition:
+class Transition(ABC):
     def __init__(self, next_state:"State"=None) -> None:
         self.__next_state = next_state
 
@@ -19,12 +20,14 @@ class Transition:
         if not isinstance(state, "State"):
             raise TypeError("Next state must be of type State")
         self.__next_state = state
-        
-    @property
+    
+    # @property
+    @abstractmethod    
     def is_transiting (self)->bool:
-        return self.next_state.is_transiting
+        pass
     
     def _exec_transiting_action(self):
+        self._do_transiting_action()
         print("Transition._exec_transiting_action")
     
     def _do_transiting_action(self):

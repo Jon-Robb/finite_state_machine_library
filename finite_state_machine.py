@@ -76,6 +76,7 @@ class FiniteStateMachine:
             """
             return self.__initial_state
         
+        
         @initial_state.setter
         def initial_state(self, state:State) -> None:
             """
@@ -135,8 +136,12 @@ class FiniteStateMachine:
             TypeError:
                 If the given list of states is not of type list of State.
             """
-            if not isinstance(states, list[State]):
-                raise TypeError("States must be of type list of State")
+            if not isinstance(states, list):
+                raise TypeError("States must be of list of State objects")
+            
+            elif not all(isinstance(state, State) for state in states):
+                raise TypeError("States must be of list of State objects")
+            
             self.__states.extend(states)
    
     class OperationalState(Enum):
@@ -185,24 +190,45 @@ class FiniteStateMachine:
         self.__current_operational_state = FiniteStateMachine.OperationalState.UNITIALIZED if unitialized else FiniteStateMachine.OperationalState.IDLE
         
     @property
-    def current_operational_state(self) -> State:
+    def current_operational_state(self) -> "OperationalState":
         """
         Returns the current operational state of the finite state machine.
         """
         return self.__current_operational_state
 
     @property
-    def current_applicative_state(self) -> "OperationalState":
+    def current_applicative_state(self) -> State:
         """
         Returns the current applicative state of the finite state machine.
         """
         return self.__current_applicative_state
 
     @current_operational_state.setter
-    def current_operational_state(self, value:State) ->None:
+    def current_operational_state(self, value:"OperationalState") ->None:
         """
         Sets the current operational state of the finite state machine to the given value.
 
+        Parameters:
+        -----------
+        value : OperationalState
+            The state to set as the current applicative state of the finite state machine.
+        
+
+        Raises:
+        -------
+        TypeError:
+            If the given value is not of type State.
+        """
+        if isinstance(value, self.OperationalState):
+            self.__current_operational_state = value
+        else:
+            raise TypeError("value must be of type State")
+            
+
+    @current_applicative_state.setter
+    def current_applicative_state(self, value:State):
+        """Sets the current applicative state of the finite state machine to the given value.
+        
         Parameters:
         -----------
         value : State
@@ -211,28 +237,9 @@ class FiniteStateMachine:
         Raises:
         -------
         TypeError:
-            If the given value is not of type State.
-        """
-        if isinstance(value, State):
-            self.__current_operational_state = value
-        else:
-            raise TypeError("value must be of type State")
-            
-
-    @current_applicative_state.setter
-    def current_applicative_state(self, value:"OperationalState"):
-        """Sets the current applicative state of the finite state machine to the given value.
-            Parameters:
-        -----------
-        value : OperationalState
-            The state to set as the current applicative state of the finite state machine.
-
-        Raises:
-        -------
-        TypeError:
             If the given value is not of type OperationalState.
         """
-        if isinstance(value, self.OperationalState):
+        if isinstance(value, State):
             self.__current_applicative_state = value
         else:
             raise TypeError("value must be of type OperationalState")
@@ -241,6 +248,7 @@ class FiniteStateMachine:
         """
         Resets the finite state machine.
         """
+        self.__current_operational_state = self.OperationalState.IDLE
         pass
 
     def _transit_by(self, transition:Transition):
@@ -252,7 +260,9 @@ class FiniteStateMachine:
         transition : Transition
             The transition by which to transition the finite state machine.
         """
-        pass
+        self.current_applicative_state._exec_exiting_action()
+        transition._exec_transiting_action()
+        self.current_applicative_state._exec_entering_action()
 
     def transit_to(self, state:State):
         """
@@ -279,9 +289,17 @@ class FiniteStateMachine:
         bool:
             Whether the current state is a terminal state or not.
         """
-
+        use_transition = self.__current_applicative_state.is_transiting
+        if isinstance(use_transition, Transition):
+            self._transit_by(use_transition)
+            
+        else:
+            self.current_applicative_state._exec_in_state_action()
         
-        pass
+        next_state_valid = self.__current_applicative_state.is_valid
+        if not next_state_valid:
+            self.__current_operational_state = self.OperationalState.TERMINAL_REACHED
+        return next_state_valid
 
     def run(self, reset:bool = True, time_budget:float = None):
         """
