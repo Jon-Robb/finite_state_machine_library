@@ -1,14 +1,7 @@
 import unittest
+import MyFSM
 from finite_state_machine import FiniteStateMachine, State, Transition
 # from transition import Transition
-class TestFiniteStateMachine(unittest.TestCase):
-    pass
-    # def test_finite_state_machine_is_invalid_with_no_states(self):
-    #     # Test that a finite state machine with no states is not valid
-
-    #     fsm = FiniteStateMachine()
-    #     self.assertFalse(fsm.is_valid)
-    
 class TestState(unittest.TestCase):
     
     def test_state_is_valid_with_no_transitions(self):
@@ -99,6 +92,8 @@ class TestLayout(unittest.TestCase):
         layout = FiniteStateMachine.Layout()
         state1 = State()
         layout.initial_state = state1
+        layout.initial_state.add_transition(TransitionSubClass(state1))
+        layout.add_state(layout.initial_state)
         self.assertTrue(layout.is_valid)
         list = []
         for _ in range(1000):
@@ -119,6 +114,20 @@ class TestLayout(unittest.TestCase):
             list.append(state)
         layout.add_states(list)
         self.assertFalse(layout.is_valid)
+    
         
+class TestMyFSM(unittest.TestCase):
+    
+    def __init__(self):
+        super().__init__()
+        self.fsm = MyFSM.MyFSM()
+    
+    def test_fsm_layout_is_valid(self):
+        self.assertTrue(self.fsm._FiniteStateMachine__layout.is_valid)
+
+    def test_applitative_state_is_equal_to_initial_state(self):
+        self.assertEqual(self.fsm.current_applicative_state, self.fsm._FiniteStateMachine__layout._Layout__initial_state)
+
+    
 if __name__ == '__main__':
     unittest.main()

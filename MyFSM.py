@@ -1,46 +1,39 @@
 from finite_state_machine import FiniteStateMachine
 from finite_state_machine import State
+from transition import Transition
+class TransitionSubClass(Transition):
+    def __init__(self, next_state: "State" = None) -> None:
+        super().__init__(next_state)
+        self.count = 0 
+    
+    @property
+    def is_transiting(self) -> bool:
+        self.count += 1
+        return self.count % 2 == 1
+
 class MyFSM(FiniteStateMachine):
     def __init__(self):
         
+        state1 = State()
+        state2 = State()
+        state3 = State()
+        state4 = State()
+        
+        transition1 = TransitionSubClass(state2)
+        transition2 = TransitionSubClass(state3)
+        transition3 = TransitionSubClass(state4)
+        transition4 = TransitionSubClass(state1)
+        
+        state1.add_transition(transition1)
+        state2.add_transition(transition2)
+        state3.add_transition(transition3)
+        state4.add_transition(transition4)
         
         layout = FiniteStateMachine.Layout()
-        layout.add_states(State(), State(), State())
+        
+        layout.initial_state = state1
+        
+        layout.add_states([layout.initial_state, state2, state3, state4])
         
         super().__init__(layout)
-        
-    def enter_state1(self):
-        
-        print("entering state 1")
-
-    def exit_state1(self):
-        print("exiting state 1")
-
-    def update_state1(self):
-        print("updating state 1")
-
-    def transition1(self):
-        print("transitioning from state 1 to state 2")
-        return True
-
-    def enter_state2(self):
-        print("entering state 2")
-
-    def exit_state2(self):
-        print("exiting state 2")
-
-    def update_state2(self):
-        print("updating state 2")
-
-    def transition2(self):
-        print("transitioning from state 2 to state 1")
-        return True
-    
- # Add states to the layout here
-        # -------------------------------------------------------------------------------------
-        # layout.add_state("State1", self.enter_state1, self.exit_state1, self.update_state1)
-        # self.add_state("State2", self.enter_state2, self.exit_state2, self.update_state2)
-        # self.add_transition("State1", "State2", self.transition1)
-        # self.add_transition("State2", "State1", self.transition2)
-        # self.set_start("State1")
         

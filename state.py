@@ -115,6 +115,8 @@ class State:
         Executes the entering action for this state.
         """
         self._do_entering_action()        
+        if self.__parameters.do_in_state_action_when_entering:
+            self._exec_in_state_action()
         print("_exec_entering_action")
 
     def _exec_in_state_action(self) -> None:

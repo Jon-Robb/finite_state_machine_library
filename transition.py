@@ -28,7 +28,6 @@ class Transition(ABC):
     
     def _exec_transiting_action(self):
         self._do_transiting_action()
-        print("Transition._exec_transiting_action")
     
     def _do_transiting_action(self):
-        print("Transition._do_transiting_action")
+        pass

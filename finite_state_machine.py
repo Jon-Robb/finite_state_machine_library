@@ -1,4 +1,5 @@
 from enum import Enum
+import time
 from state import State
 from transition import Transition
 
@@ -68,7 +69,7 @@ class FiniteStateMachine:
         def __init__(self) -> None:
             self.__states = []
             self.__initial_state = None
-        
+
         @property
         def initial_state(self) -> State:
             """
@@ -101,7 +102,7 @@ class FiniteStateMachine:
             """
             Returns True if the layout is valid, i.e. it contains all states and an initial state.
             """
-            return all(state.is_valid for state in self.__states) and self.__initial_state
+            return self.__initial_state and self.__initial_state in self.__states and all(state.is_valid for state in self.__states)
 
     
         def add_state(self, state:State) -> None:
@@ -248,8 +249,9 @@ class FiniteStateMachine:
         """
         Resets the finite state machine.
         """
+        self.__current_applicative_state = self.__layout.initial_state
+        self.__current_applicative_state._exec_entering_action()
         self.__current_operational_state = self.OperationalState.IDLE
-        pass
 
     def _transit_by(self, transition:Transition):
         """
@@ -262,6 +264,7 @@ class FiniteStateMachine:
         """
         self.current_applicative_state._exec_exiting_action()
         transition._exec_transiting_action()
+        self.current_applicative_state = transition.next_state
         self.current_applicative_state._exec_entering_action()
 
     def transit_to(self, state:State):
@@ -278,6 +281,9 @@ class FiniteStateMachine:
         TypeError:
             If the given state is not of type State.
         """
+        transition = Transition(state)
+        self._transit_by(transition)
+
         pass
 
     def track(self)-> bool:
@@ -312,10 +318,16 @@ class FiniteStateMachine:
         time_budget : float, optional
             The maximum time (in seconds) for which to run the finite state machine. If None (default), there is no time limit.
         """
-        print("Enweille roule mon esti!")
+        if self.__current_operational_state == self.OperationalState.IDLE:
+            self.__current_operational_state = self.OperationalState.RUNNING
+
+        while self.__current_operational_state == self.OperationalState.RUNNING:
+            print("Current state: {}".format(self.__current_applicative_state))
+
 
     def stop(self):
         """
         Stops the finite state machine.
         """
-        pass
+        if self.__current_operational_state == self.OperationalState.RUNNING:
+            self.__current_operational_state = self.OperationalState.IDLE
