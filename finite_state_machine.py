@@ -121,6 +121,8 @@ class FiniteStateMachine:
             """
             if not isinstance(state, State):
                 raise TypeError("State must be of type State")
+            if state in self.__states:
+                raise Exception("state is already in self.__states)
             self.__states.append(state)
             
         def add_states(self, states:list[State]) -> None:
@@ -138,10 +140,12 @@ class FiniteStateMachine:
                 If the given list of states is not of type list of State.
             """
             if not isinstance(states, list):
-                raise TypeError("States must be of list of State objects")
-            
+                raise TypeError("States must be of list of State objects")  
             elif not all(isinstance(state, State) for state in states):
                 raise TypeError("States must be of list of State objects")
+            for state in states:
+                if state in self.__states:
+                    raise Exception(f'{state} is already in self.__states')
             
             self.__states.extend(states)
    
