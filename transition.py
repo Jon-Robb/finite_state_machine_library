@@ -34,18 +34,33 @@ class Transition(ABC):
         pass
 
 class ConditionalTransition(Transition):
-    def __init__(self, condition:Condition=None) -> None:
+    def __init__(self, next_state:"State"=None, condition:Condition=None) -> None:
         super().__init__(next_state)
         self.__condition = condition
         
+    @property
+    def condition(self)->Condition:
+        return self.__condition
+    
+    @condition.setter
+    def condition(self, condition:Condition)->None:
+        if not isinstance(condition, Condition):
+            raise TypeError("Condition must be of type Condition")
+        self.__condition = condition
+        
+    @property
+    def is_transiting(self)->bool:
+        return self.__condition
+        
 
 class ActionTransition(ConditionalTransition):
-    def __init__(self, next_state:"State"=None) -> None:
-        super().__init__(next_state)
+    def __init__(self, next_state:"State"=None, condition:"Condition"=None) -> None:
+        super().__init__(next_state, condition)
         self.__transiting_action = []
         
     def _do_transiting_action(self) -> None:
-        pass
+        for action in self.__transiting_action:
+            action()
     
     def add_transiting_action(self, action:callable) -> None:
         if action() is not None:
@@ -54,12 +69,12 @@ class ActionTransition(ConditionalTransition):
         
         
 class MonitoredTransition(ActionTransition):
-    def __init__(self, next_state:"State"=None) -> None:
-        super().__init__(next_state)
+    def __init__(self, next_state:"State"=None, condition:"Condition"=None) -> None:
+        super().__init__(next_state, condition)
         
-        self.__transit_count = 0
-        self.__last_transit_time = 0
-        self.custom = None
+        self.__transit_count: int = 0
+        self.__last_transit_time: float = 0
+        self.custom_value: any = None
         
     @property
     def transit_count(self)->int:
