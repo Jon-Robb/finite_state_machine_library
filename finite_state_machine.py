@@ -122,7 +122,7 @@ class FiniteStateMachine:
             if not isinstance(state, State):
                 raise TypeError("State must be of type State")
             if state in self.__states:
-                raise Exception("state is already in self.__states)
+                raise Exception("state is already in self.__states")
             self.__states.append(state)
             
         def add_states(self, states:list[State]) -> None:
@@ -270,6 +270,9 @@ class FiniteStateMachine:
         transition._exec_transiting_action()
         self.current_applicative_state = transition.next_state
         self.current_applicative_state._exec_entering_action()
+        
+        if self.current_applicative_state._State__parameters.terminal:
+            self.current_operational_state = self.OperationalState.TERMINAL_REACHED
 
     def transit_to(self, state:State):
         """
@@ -306,12 +309,15 @@ class FiniteStateMachine:
         else:
             self.current_applicative_state._exec_in_state_action()
         
-        next_state_valid = self.__current_applicative_state.is_valid
-        if not next_state_valid:
-            self.__current_operational_state = self.OperationalState.TERMINAL_REACHED
-        return next_state_valid
+        # next_state_valid = self.__current_applicative_state.is_valid
+        # print(next_state_valid)
+        # if not next_state_valid:
+        #     self.__current_operational_state = self.OperationalState.TERMINAL_REACHED
+        # return next_state_valid
+        return not self.__current_operational_state == self.OperationalState.TERMINAL_REACHED
 
-    def run(self, reset:bool = True, time_budget:float = None):
+
+    def start(self, reset:bool = True, time_budget:float = None):
         """
         Runs the finite state machine, optionally resetting it first and limiting the time budget for running.
 
@@ -322,11 +328,14 @@ class FiniteStateMachine:
         time_budget : float, optional
             The maximum time (in seconds) for which to run the finite state machine. If None (default), there is no time limit.
         """
+        # print("Starting state machine")
         if self.__current_operational_state == self.OperationalState.IDLE:
             self.__current_operational_state = self.OperationalState.RUNNING
 
-        while self.__current_operational_state == self.OperationalState.RUNNING:
-            print("Current state: {}".format(self.__current_applicative_state))
+        while self.__current_operational_state == self.OperationalState.RUNNING and self.track():
+            pass
+            # print("Current state: {}".format(self.__current_applicative_state))
+            
 
 
     def stop(self):

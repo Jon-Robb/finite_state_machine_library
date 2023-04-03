@@ -14,35 +14,21 @@ class TrafficLight(State):
     def _do_exiting_action(self) -> None:
         print(f'Exiting {self.color} Light State')
 
-class RedToGreen(Transition):
-    def __init__(self, next_state: TrafficLight('green') = None) -> None:
-        super().__init__(next_state)
+class TransitionToColor(Transition):
+    def __init__(self, state) -> None:
+        super().__init__(state)
         self.count = 0 
-    
+        
     @property
     def is_transiting(self) -> bool:
+        if self.count > 100:
+            self.count = 0
+            return True
         self.count += 1
-        return self.count > 60
-    
-class GreenToYellow(Transition):
-    def __init__(self, next_state: TrafficLight('yellow') = None) -> None:
-        super().__init__(next_state)
-        self.count = 0 
-    
-    @property
-    def is_transiting(self) -> bool:
-        self.count += 1
-        return self.count > 60
-    
-class YellowToRed(Transition):
-    def __init__(self, next_state: TrafficLight('red') = None) -> None:
-        super().__init__(next_state)
-        self.count = 0 
-    
-    @property
-    def is_transiting(self) -> bool:
-        self.count += 1
-        return self.count > 60
+        return self.count > 100
+
+    def _do_transition_action(self) -> None:
+        print(f'Transitioning to {self.next_state.color.capitalize()} Light State')
     
 class TrafficLights(FiniteStateMachine):
     def __init__(self):
@@ -51,23 +37,22 @@ class TrafficLights(FiniteStateMachine):
         gl = TrafficLight('green')
         yl = TrafficLight('yellow')
         
-        rtg = RedToGreen(gl)
-        gty = GreenToYellow(yl)
-        ytr = YellowToRed(rl)
+        tg = TransitionToColor(gl)
+        ty = TransitionToColor(yl)
+        tr = TransitionToColor(rl)
         
-        rl.add_transition(rtg)
-        gl.add_transition(gty)
-        yl.add_transition(ytr)
+        rl.add_transition(tg)
+        gl.add_transition(ty)
+        yl.add_transition(tr)
         
         layout = FiniteStateMachine.Layout()
-        
+        layout.add_states([rl, gl, yl])  
         layout.initial_state = rl
         
-        layout.add_states([layout.initial_state, gl, yl])
-        
-        super().__init__(layout)
+        super().__init__(layout=layout, unitialized = False)
         
 
 if __name__ == "__main__":
     tl = TrafficLights()
-    tl.run()
+    
+    tl.start()

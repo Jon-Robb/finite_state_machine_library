@@ -1,5 +1,6 @@
-from typing import TYPE_CHECKING
+
 #if TYPE_CHECKING:
+from typing import Callable
 from transition import Transition
 
 
@@ -57,7 +58,7 @@ class State:
     @property
     def is_valid(self) -> bool:
         """
-        Returns whether this state is valid or not, i.e., whether it has at least one transition and all transitions are valid.
+        Returns whether this state is valid or not, i.e., whether it has at least one transition, and all transitions are valid.
 
         Returns:
         --------
@@ -88,6 +89,7 @@ class State:
         Transition:
             The current transition for this state, or None if there is no current transition.
         """
+        next_transition = next((transition for transition in self.__transitions if transition.is_transiting), None)
         return next((transition for transition in self.__transitions if transition.is_transiting), None)
 
     def add_transition(self, transition: "Transition") -> None:
@@ -117,14 +119,14 @@ class State:
         self._do_entering_action()        
         if self.__parameters.do_in_state_action_when_entering:
             self._exec_in_state_action()
-        print("_exec_entering_action")
+        # print("_exec_entering_action")
 
     def _exec_in_state_action(self) -> None:
         """
         Executes the in-state action for this state.
         """
         self._do_in_state_action()
-        print("_exec_in_state_action")
+        # print("_exec_in_state_action")
     
     def _exec_exiting_action(self) -> None:
         """
@@ -152,71 +154,73 @@ class State:
         Does the exiting action for this state.
         """
         raise NotImplementedError("_do_exiting_action must be implemented.")
-        print("_do_exiting_action")
+        # print("_do_exiting_action")
 
 
 
 
-
-# from typing import TYPE_CHECKING
-# if TYPE_CHECKING:
-#     from transition import Transition
-
-
-# class State:
-
-#     class Parameters:
-#         def __init__(self) -> None:
-#             self.terminal = False
-#             self.do_in_state_action_when_entering = False
-#             self.do_in_state_action_when_exiting = False
-
-#     def __init__(self, parameters:Parameters=Parameters()) -> None:
-#         pass
-
-#         self.__parameters = parameters
-#         self.__transition = []
-
-#     @property
-#     def is_valid(self) -> bool:
-#         all_transitions_are_valid = True
-#         for transition in self.__transition:
-#             if not transition.is_valid():
-#                 all_transitions_are_valid = False
-#                 break
-#         return self.__transition and all_transitions_are_valid
+class ActionState(State):
     
-#     @property
-#     def is_terminal(self) -> bool:
-#         return self.__parameters.terminal
-
-#     @property
-#     def is_transiting(self)->"Transition":
-#         pass
-
-#     def add_transition(self, transition:"Transition")->None:
-#         if not isinstance(transition, Transition):
-#             raise TypeError("transition must be of type Transition")
-#         self.__transition.append(transition)
+    def __init__(self, parameters: "State.Parameters" = State.Parameters()) -> None:
+        super().__init__(parameters)
+        self.__entering_actions = []
+        self.__in_state_actions = []
+        self.__exiting_actions = []
+        
+    def _do_entering_action(self) -> None:
+        print("Action state entering action")
+    
+    def _do_in_state_action(self) -> None:
+        print("Action state in-state action")
+    
+    def _do_exiting_action(self) -> None:
+        print ("Action state exiting action")
+        
+    def add_entering_action(self, action: Callable) -> None:
+        if not callable(action):
+            raise TypeError("action must be callable")
+        self.__entering_actions.append(action)
+        
+    def add_in_state_action(self, action: Callable) -> None:
+        if not callable(action):
+            raise TypeError("action must be callable")
+        self.__in_state_actions.append(action)
+        
+    def add_exiting_action(self, action: Callable) -> None:
+        if not callable(action):
+            raise TypeError("action must be callable")
+        self.__exiting_actions.append(action)
         
         
-#     def _exec_entering_action(self):
-#         print("_exec_entering_action")
-
-#     def _exec_in_state_action(self):
-#         print("_exec_in_state_action")
+        
+        
+class MonitoredState(ActionState):
+    def __init__(self, parameters: "State.Parameters" = State.Parameters()) -> None:
+        super().__init__(parameters)
+        self.__counter_last_entry = 0
+        self.__counter_last_exit = 0
+        self.__entry_count = 0 
+        self.custom_value = any 
+        
+    @property
+    def entry_count(self) -> int:
+        return self.__entry_count
+    @property
+    def last_entry_time(self)->float:
+        return self.__counter_last_entry
+    @property
+    def last_exit_time(self)->float:
+        return self.__counter_last_exit
     
-#     def _exec_exiting_action(self):
-#         print("_exec_exiting_action")
-    
-#     def _do_entering_action(self):
-#         print("_do_entering_action")
-
-#     def _do_in_state_action(self):
-#         print("_do_in_state_action")
-
-#     def _do_exiting_action(self):
-#         print("_do_exiting_action")
-
-
-    
+    def reset_entry_count(self):
+        self.__entry_count = 0
+        
+    def reset_last_times(self):
+        self.__counter_last_entry = 0
+        self.__counter_last_exit = 0
+        
+    def _exec_entering_action(self) -> None:
+        print("Monitored state entering action")
+        
+    def _exec_exiting_action(self) -> None:
+        print("Monitored state exiting action")
