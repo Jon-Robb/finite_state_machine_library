@@ -34,7 +34,7 @@ class Transition(ABC):
         pass
 
 class ConditionalTransition(Transition):
-    def __init__(self, condition:Condition=None) -> None:
+    def __init__(self, condition:Condition=None, next_state:"State") -> None:
         super().__init__(next_state)
         self.__condition = condition
         
