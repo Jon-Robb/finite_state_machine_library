@@ -1,7 +1,9 @@
 
 #if TYPE_CHECKING:
-from typing import Callable
-from transition import Transition
+import time
+from typing import Callable, TYPE_CHECKING
+if TYPE_CHECKING:
+    from transition import Transition
 
 
 class State:
@@ -107,8 +109,8 @@ class State:
             If the given transition is not of type Transition.
         """
         # if  type(transition) is not Transition:
-        if not isinstance(transition, Transition):
-            raise TypeError("transition must be of type Transition")
+        # if not isinstance(transition, "Transition"):
+        #     raise TypeError("transition must be of type Transition")
         self.__transitions.append(transition)
         
         
@@ -179,16 +181,22 @@ class ActionState(State):
     def add_entering_action(self, action: Callable) -> None:
         if not callable(action):
             raise TypeError("action must be callable")
+        if action() is not None:
+            raise Exception("Callable must return None")
         self.__entering_actions.append(action)
         
     def add_in_state_action(self, action: Callable) -> None:
         if not callable(action):
             raise TypeError("action must be callable")
+        if action() is not None:
+            raise Exception("Callable must return None")
         self.__in_state_actions.append(action)
         
     def add_exiting_action(self, action: Callable) -> None:
         if not callable(action):
             raise TypeError("action must be callable")
+        if action() is not None:
+            raise Exception("Callable must return None")
         self.__exiting_actions.append(action)
         
         
@@ -220,7 +228,10 @@ class MonitoredState(ActionState):
         self.__counter_last_exit = 0
         
     def _exec_entering_action(self) -> None:
-        print("Monitored state entering action")
-        
+        self.__counter_last_entry = time.perf_counter()
+        self.__entry_count += 1
+        super()._exec_entering_action()
+   
     def _exec_exiting_action(self) -> None:
-        print("Monitored state exiting action")
+        super()._exec_exiting_action()
+        self.__counter_last_exit = time.perf_counter()

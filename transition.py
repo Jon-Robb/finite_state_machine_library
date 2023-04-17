@@ -1,7 +1,8 @@
+import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-from Condition import Condition
 if TYPE_CHECKING:
+    from Condition import Condition
     from state import State
 
 class Transition(ABC):
@@ -34,23 +35,25 @@ class Transition(ABC):
         pass
 
 class ConditionalTransition(Transition):
-    def __init__(self, next_state:"State"=None, condition:Condition=None) -> None:
+    def __init__(self, next_state:"State"=None, condition:"Condition"=None) -> None:
         super().__init__(next_state)
         self.__condition = condition
         
     @property
-    def condition(self)->Condition:
+    def condition(self)->"Condition":
         return self.__condition
     
     @condition.setter
-    def condition(self, condition:Condition)->None:
+    def condition(self, condition:"Condition")->None:
+        from Condition import Condition
         if not isinstance(condition, Condition):
             raise TypeError("Condition must be of type Condition")
         self.__condition = condition
         
     @property
     def is_transiting(self)->bool:
-        return self.__condition
+        return self.__condition._compare()
+        # bool(self.__condition)
         
 
 class ActionTransition(ConditionalTransition):
@@ -63,6 +66,8 @@ class ActionTransition(ConditionalTransition):
             action()
     
     def add_transiting_action(self, action:callable) -> None:
+        if not callable(action):
+            raise TypeError("Actiom must be callable")
         if action() is not None:
             raise Exception("Callable must return None")
         self.__transiting_action.append(action)
@@ -91,5 +96,7 @@ class MonitoredTransition(ActionTransition):
         self.__last_transit_time = 0
         
     def _exec_transiting_action(self):
+        self.__transit_count += 1
+        self.__last_transit_time = time.perf_counter()
         return super()._exec_transiting_action()
         
