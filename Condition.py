@@ -144,10 +144,11 @@ class StateEntryCountCondition(MonitoredStateCondition):
             
         
     def _compare(self)->bool:
-        if self.monitored_state.entry_count >= self.__ref_count and self.__auto_reset:
-            self.reset_count()
-            
-        return self.monitored_state.entry_count >= self.__ref_count
+        if self.monitored_state.entry_count >= self.__ref_count:
+            if self.__auto_reset:
+                self.reset_count()
+            return True
+        return False
 
 
     def reset_count(self):
