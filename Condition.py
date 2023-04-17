@@ -69,7 +69,7 @@ class TimedCondition(Condition):
     def __init__(self, duration:float, time_reference:float=None, inverse:bool=False):
         super().__init__(inverse)
         self.__counter_duration = duration
-        self.__counter_reference = time_reference if time_reference is not None else time.perf_counter
+        self.__counter_reference = time_reference if time_reference is not None else time.perf_counter()
         
     def _compare(self) -> bool:
         return  time.perf_counter() - self.__counter_reference  >= self.__counter_duration 
@@ -121,17 +121,13 @@ class StateEntryDurationCondition(MonitoredStateCondition):
         self.__duration = duration
         
     def _compare(self)->bool:
-        return self.monitored_state.last_entry_time + self.duration >= time.perf_counter()  
+        return time.perf_counter() - self.monitored_state.last_entry_time >= self.duration    
 
 
 class StateEntryCountCondition(MonitoredStateCondition):
     def __init__(self, expected_count:int, monitored_state:"MonitoredState", auto_reset:bool = True, inverse:bool=False):
         super().__init__(monitored_state, inverse)
-        
-        if not isinstance(expected_count, int):
-            raise TypeError("expected_count must be of type int")
-        if not isinstance(auto_reset, bool):
-            raise TypeError("auto_reset must be of type bool")
+    
         self.__ref_count = expected_count
         self.__expected_count = expected_count
         self.__auto_reset = auto_reset

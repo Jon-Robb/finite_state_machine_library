@@ -52,9 +52,9 @@ class ConditionalTransition(Transition):
         
     @property
     def is_transiting(self)->bool:
-        return self.__condition._compare()
-        # bool(self.__condition)
-        
+        if self.__condition is not None:
+            return self.__condition._compare()
+        raise Exception("Condition is not set")        
 
 class ActionTransition(ConditionalTransition):
     def __init__(self, next_state:"State"=None, condition:"Condition"=None) -> None:

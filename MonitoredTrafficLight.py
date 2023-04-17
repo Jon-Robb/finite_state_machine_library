@@ -1,7 +1,7 @@
 
 
 
-from Condition import TimedCondition
+from Condition import StateEntryDurationCondition, TimedCondition
 from state import MonitoredState
 from finite_state_machine import FiniteStateMachine
 from transition import MonitoredTransition
@@ -35,19 +35,26 @@ class TransitionToColor(MonitoredTransition):
     def _do_transition_action(self) -> None:
         print(f'Transitioning to {self.next_state.color.capitalize()} Light State')
     
-class MonitoredTrafficLights(FiniteStateMachine):
+class StateDurationMonitoredTrafficLights(FiniteStateMachine):
     def __init__(self):
         
-        c1 = TimedCondition(10000)
+        # c1 = TimedCondition(1)
+        # c2 = TimedCondition(2)
+        # c3 = TimedCondition(3)
+        
         
         rl = MonitoredTrafficLight('red')
-        gl = MonitoredTrafficLight('green')
-        yl = MonitoredTrafficLight('yellow')
+        sc1 = StateEntryDurationCondition(1.0, rl)
         
-        tg = TransitionToColor(gl, c1)
-    
-        ty = TransitionToColor(yl)
-        tr = TransitionToColor(rl)
+        gl = MonitoredTrafficLight('green')
+        sc2 = StateEntryDurationCondition(1.0, gl)
+        
+        yl = MonitoredTrafficLight('yellow')
+        sc3 = StateEntryDurationCondition(1.0, yl)
+        
+        tg = TransitionToColor(gl, sc1)
+        ty = TransitionToColor(yl, sc2)
+        tr = TransitionToColor(rl, sc3)
         
         rl.add_transition(tg)
         gl.add_transition(ty)
@@ -61,6 +68,5 @@ class MonitoredTrafficLights(FiniteStateMachine):
         
 
 if __name__ == "__main__":
-    mtl = MonitoredTrafficLights()
-    
+    mtl = StateDurationMonitoredTrafficLights()
     mtl.start()
