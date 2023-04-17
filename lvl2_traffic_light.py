@@ -105,7 +105,7 @@ class StateEntryCountMonitoredTrafficLights(FiniteStateMachine):
         transit_red = TransitionToColor(rl, condition_to_red)
         
         transit_to_green_at_count_2 = TransitionToColor(rl, StateEntryCountCondition(2, gl, auto_reset=False))
-        transit_to_green_at_count_2.add_transiting_action(lambda: print('TABARNAKKKKAWUEGHWIUGHIWUGHWIUGHWIUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWEIUGHWEIUGHWEIGUHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGKK'))
+        transit_to_green_at_count_2.add_transiting_action(lambda: print('DAGDGSDGSDGSDGSDGAWUEGHWIUGHIWUGHWIUGHWIUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWEIUGHWEIUGHWEIGUHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGHWIEUGKK'))
         
         rl.add_transition(transit_green)
         rl.add_transition(transit_to_green_at_count_2)
