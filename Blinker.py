@@ -14,7 +14,7 @@ class Blinker(FiniteStateMachine):
     def __init__(self, off_state_generator: StateGenerator, on_state_generator: StateGenerator) -> None:
         
         
-        # Create states and their custom fields
+        # 1-Create states and their custom fields
         self.off = off_state_generator()
         self.off._FSM_BLINKER_ON_STATE = False
         self.off._do_in_state_action = lambda: print('In Blinker Off State')
@@ -34,26 +34,40 @@ class Blinker(FiniteStateMachine):
         self.blink_begin = on_state_generator()
         self.blink_begin._FSM_BLINKER_ON_STATE = None
         
-        # Create conditions
+        self.off_duration = MonitoredState()
+        self.off_duration._FSM_BLINKER_ON_STATE = False
+        self.off_duration._do_in_state_action = lambda: print("In off duration")
+        
+        self.on_duration = MonitoredState()
+        self.on_duration._FSM_BLINKER_ON_STATE = True
+        self.on_duration._do_in_state_action = lambda: print("In On duration")
+        
+        # 2-Create conditions
         self.blink_on_condition = StateEntryDurationCondition(1.0, self.blink_on)
         self.blink_off_condition = StateEntryDurationCondition(1.0, self.blink_off)
-    
-        # Create transitions
+        self.off_duration_condition = StateEntryDurationCondition(1.0, self.off_duration)
+        self.on_duration_condition = StateEntryDurationCondition(1.0, self.on_duration)
+        
+        # 3-Create transitions
         blink_on_to_blink_off = MonitoredTransition(self.blink_off, self.blink_on_condition)
         blink_off_to_blink_on = MonitoredTransition(self.blink_on, self.blink_off_condition)
+        off_duration_to_on = MonitoredTransition(self.on, self.off_duration_condition)
+        on_duration_to_off = MonitoredTransition(self.off, self.on_duration_condition)
         
-        # Add transitions to states
+        # 4-Add transitions to states
         self.blink_on.add_transition(blink_on_to_blink_off)
         self.blink_off.add_transition(blink_off_to_blink_on)
+        self.off_duration.add_transition(off_duration_to_on)
+        self.on_duration.add_transition(on_duration_to_off)
         
-        # Create layout
+        # 5-Create layout
         layout = FiniteStateMachine.Layout()
     
-        # Add states to layout
+        # 6-Add states to layout
         layout.initial_state = self.off
         layout.add_states([self.off, self.on, self.blink_begin, self.blink_on, self.blink_off])
         
-        # Add the starting state
+        # 7-Add the starting state
         self.current_state = layout.initial_state
         
         # Create FSM        
@@ -63,17 +77,23 @@ class Blinker(FiniteStateMachine):
     def is_on(self) -> bool:
         return self.current_state._FSM_BLINKER_ON_STATE is True
         
-    
     @property
     def is_off(self) -> bool:
         return self.current_state._FSM_BLINKER_ON_STATE is False
     
-    def turn_off(self):
-        self.transit_to(self.off)
-    #    self.current_state = self.off
+    def turn_off(self, **kwargs):
+        if kwargs.keys() == {'duration'}:
+            self.off_duration_condition.duration = kwargs['duration']
+            self.transit_to(self.off_duration)
+        else:
+            self.transit_to(self.off)
    
-    def turn_on(self):
-       self.transit_to(self.on)
+    def turn_on(self, **kwargs):
+        if kwargs.keys() == {'duration'}:
+            self.on_duration_condition.duration = kwargs['duration']
+            self.transit_to(self.on_duration)
+        else:
+            self.transit_to(self.on)
        
     def blink(self, cycle_duration:float = 1.0, percent_on:float = 0.5, begin_on: bool = True):
         if cycle_duration <= 0:
@@ -103,8 +123,9 @@ if __name__ == "__main__":
         return state
     
     blinker = Blinker(off_state_generator, on_state_generator)
-    blinker.blink(1.0, 0.9, True)
-    for _ in range(2346346364):
+    # blinker.blink(2.0, 0.5, True)
+    blinker.turn_off(duration=2.0)
+    for _ in range(1000000):
         blinker.track()
     
    
