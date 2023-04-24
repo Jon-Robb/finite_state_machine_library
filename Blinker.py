@@ -34,6 +34,8 @@ class Blinker(FiniteStateMachine):
         self.blink_begin = on_state_generator()
         self.blink_begin._FSM_BLINKER_ON_STATE = None
         
+        #TODO: Do the blink_stop_begin state
+        
         self.off_duration = MonitoredState()
         self.off_duration._FSM_BLINKER_ON_STATE = False
         self.off_duration._do_in_state_action = lambda: print("In off duration")
@@ -95,6 +97,7 @@ class Blinker(FiniteStateMachine):
         else:
             self.transit_to(self.on)
        
+    # TODO -> SURCHARGE DE METHODE
     def blink(self, cycle_duration:float = 1.0, percent_on:float = 0.5, begin_on: bool = True):
         if cycle_duration <= 0:
             raise ValueError("cycle_duration must be greater than zero")
