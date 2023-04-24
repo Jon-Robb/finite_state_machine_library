@@ -1,6 +1,6 @@
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from Condition import Condition
     from state import State
@@ -57,6 +57,9 @@ class ConditionalTransition(Transition):
         raise Exception("Condition is not set")        
 
 class ActionTransition(ConditionalTransition):
+    
+    Action = Callable[[], None]
+    
     def __init__(self, next_state:"State"=None, condition:"Condition"=None) -> None:
         super().__init__(next_state, condition)
         self.__transiting_action = []
@@ -65,7 +68,7 @@ class ActionTransition(ConditionalTransition):
         for action in self.__transiting_action:
             action()
     
-    def add_transiting_action(self, action:callable) -> None:
+    def add_transiting_action(self, action: Action) -> None:
         if not callable(action):
             raise TypeError("Actiom must be callable")
         if action() is not None:

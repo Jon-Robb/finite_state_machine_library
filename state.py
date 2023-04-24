@@ -67,7 +67,7 @@ class State:
         bool:
             Whether this state is valid or not.
         """
-        return self.__transitions and all(transition.is_valid for transition in self.__transitions)
+        return all(transition.is_valid for transition in self.__transitions) if self.__transitions else True
     
     @property
     def is_terminal(self) -> bool:
@@ -163,6 +163,8 @@ class State:
 
 class ActionState(State):
     
+    Action = Callable[[], None]
+    
     def __init__(self, parameters: "State.Parameters" = State.Parameters()) -> None:
         super().__init__(parameters)
         self.__entering_actions = []
@@ -170,33 +172,27 @@ class ActionState(State):
         self.__exiting_actions = []
         
     def _do_entering_action(self) -> None:
-        print("Action state entering action")
+        pass
     
     def _do_in_state_action(self) -> None:
-        print("Action state in-state action")
+        pass
     
     def _do_exiting_action(self) -> None:
-        print ("Action state exiting action")
+        pass
         
-    def add_entering_action(self, action: Callable) -> None:
+    def add_entering_action(self, action: Action) -> None:    
         if not callable(action):
-            raise TypeError("action must be callable")
-        if action() is not None:
-            raise Exception("Callable must return None")
+            raise TypeError("action must be callable")    
         self.__entering_actions.append(action)
         
-    def add_in_state_action(self, action: Callable) -> None:
+    def add_in_state_action(self, action: Action) -> None:
         if not callable(action):
-            raise TypeError("action must be callable")
-        if action() is not None:
-            raise Exception("Callable must return None")
+            raise TypeError("action must be callable")  
         self.__in_state_actions.append(action)
         
-    def add_exiting_action(self, action: Callable) -> None:
+    def add_exiting_action(self, action: Action) -> None:
         if not callable(action):
             raise TypeError("action must be callable")
-        if action() is not None:
-            raise Exception("Callable must return None")
         self.__exiting_actions.append(action)
         
         
