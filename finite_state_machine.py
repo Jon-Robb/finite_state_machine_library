@@ -288,10 +288,14 @@ class FiniteStateMachine:
         TypeError:
             If the given state is not of type State.
         """
-        transition = Transition(state)
-        self._transit_by(transition)
+        # transition = Transition(state)
+        self.current_applicative_state = state
+        self.current_applicative_state._exec_entering_action()
+    
+        if self.current_applicative_state._State__parameters.terminal:
+            self.current_operational_state = self.OperationalState.TERMINAL_REACHED
 
-        pass
+    
 
     def track(self)-> bool:
         """

@@ -4,6 +4,7 @@ from typing import Callable
 from Condition import AlwaysTrueCondition, StateEntryDurationCondition
 from finite_state_machine import FiniteStateMachine
 from state import MonitoredState
+from transition import MonitoredTransition
 
 
 class Blinker(FiniteStateMachine):
@@ -16,30 +17,44 @@ class Blinker(FiniteStateMachine):
         # Create states and their custom fields
         self.off = off_state_generator()
         self.off._FSM_BLINKER_ON_STATE = False
-        
-        self._do_in_state_action = lambda: ...
+        self.off._do_in_state_action = lambda: print('In Blinker Off State')
         
         self.on = on_state_generator()
         self.on._FSM_BLINKER_ON_STATE = True
+        self.on._do_in_state_action = lambda: print('In Blinker On State')
         
-        self.blink_begin = MonitoredState()
+        self.blink_on = on_state_generator()
+        self.blink_on._FSM_BLINKER_ON_STATE = True
+        self.blink_on._do_in_state_action = lambda: print("Blink On")
+
+        self.blink_off = off_state_generator()
+        self.blink_off._FSM_BLINKER_ON_STATE = False
+        self.blink_off._do_in_state_action = lambda: print("Blink Off")
+        
+        self.blink_begin = on_state_generator()
         self.blink_begin._FSM_BLINKER_ON_STATE = None
         
         # Create conditions
-        #always_true = AlwaysTrueCondition(inverse=True)
-        
+        self.blink_on_condition = StateEntryDurationCondition(1.0, self.blink_on)
+        self.blink_off_condition = StateEntryDurationCondition(1.0, self.blink_off)
+    
         # Create transitions
-        
+        blink_on_to_blink_off = MonitoredTransition(self.blink_off, self.blink_on_condition)
+        blink_off_to_blink_on = MonitoredTransition(self.blink_on, self.blink_off_condition)
         
         # Add transitions to states
-        
+        self.blink_on.add_transition(blink_on_to_blink_off)
+        self.blink_off.add_transition(blink_off_to_blink_on)
         
         # Create layout
         layout = FiniteStateMachine.Layout()
     
         # Add states to layout
         layout.initial_state = self.off
-        layout.add_states([self.off, self.on])    
+        layout.add_states([self.off, self.on, self.blink_begin, self.blink_on, self.blink_off])
+        
+        # Add the starting state
+        self.current_state = layout.initial_state
         
         # Create FSM        
         super().__init__(layout=layout, unitialized=False)
@@ -54,10 +69,11 @@ class Blinker(FiniteStateMachine):
         return self.current_state._FSM_BLINKER_ON_STATE is False
     
     def turn_off(self):
-       self.current_state = self.off
+        self.transit_to(self.off)
+    #    self.current_state = self.off
    
     def turn_on(self):
-       self.current_state = self.on
+       self.transit_to(self.on)
        
     def blink(self, cycle_duration:float = 1.0, percent_on:float = 0.5, begin_on: bool = True):
         if cycle_duration <= 0:
@@ -65,21 +81,14 @@ class Blinker(FiniteStateMachine):
         if percent_on < 0 or percent_on > 1:
             raise ValueError("percent_on must be between 0 and 1")
         
+        self.blink_on_condition.duration = cycle_duration * percent_on
+        self.blink_off_condition.duration = cycle_duration - self.blink_on_condition.duration
+        
         if begin_on:
-            self.turn_on()
+            self.transit_to(self.blink_on)
         else:
-            self.turn_off()
-            
-        on_duration = cycle_duration * percent_on
-        off_duration = cycle_duration - on_duration
-        
-        # blink until condition is reached or interrupted
-        while self.current_state._FSM_BLINKER_ON_STATE is True:
-            time.sleep(on_duration)
-            self.turn_off()
-            time.sleep(off_duration)
-            self.turn_on()
-        
+            self.transit_to(self.blink_off)
+
         
 if __name__ == "__main__":
     
@@ -94,17 +103,8 @@ if __name__ == "__main__":
         return state
     
     blinker = Blinker(off_state_generator, on_state_generator)
-    blinker.start()
-    
-    blinker.current_state = blinker.on
-    start_time = time.perf_counter()
-    
-    while True == True:
-        time.sleep(1)
-        blinker.off
-        time.sleep(1)
-        blinker.on
-    
-    
+    blinker.blink(1.0, 0.9, True)
+    for _ in range(2346346364):
+        blinker.track()
     
    
