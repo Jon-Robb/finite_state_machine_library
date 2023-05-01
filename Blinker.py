@@ -34,7 +34,6 @@ class Blinker(FiniteStateMachine):
         self.blink_begin = MonitoredState()
         self.blink_begin._FSM_BLINKER_ON_STATE = None
         
-        #TODO: Do the blink_stop_begin state
         self.blink_stop_begin = MonitoredState()
         self.blink_stop_begin._FSM_BLINKER_ON_STATE = None
 
@@ -78,8 +77,6 @@ class Blinker(FiniteStateMachine):
         blink_off_to_blink_on = MonitoredTransition(self.blink_on, self.blink_off_condition)
         off_duration_to_on = MonitoredTransition(self.on, self.off_duration_condition)
         on_duration_to_off = MonitoredTransition(self.off, self.on_duration_condition)
-        # blink_stop_end_to_off = MonitoredTransition(self.off, self.blink_stop_off_conditons)
-        # blink_stop_end_to_on = MonitoredTransition(self.on, self.blink_stop_off_conditons)
         stop_on_to_stop_off = MonitoredTransition(self.blink_stop_off, self.blink_stop_on_to_blink_stop_off_condition)
         stop_off_to_stop_on = MonitoredTransition(self.blink_stop_on, self.blink_stop_off_to_blink_stop_on_condition)
         blink_stop_begin_to_blink_stop_end_duration = MonitoredTransition(self.blink_stop_end, self.blink_stop_begin_total_duration_condition)
@@ -132,7 +129,6 @@ class Blinker(FiniteStateMachine):
         else:
             self.transit_to(self.on)
        
-    # TODO -> SURCHARGE DE METHODE
     def blink(self, percent_on:float=0.5, begin_on:bool=True, **kwargs):
         
         # Arg checking and variable initialization
@@ -174,15 +170,19 @@ class Blinker(FiniteStateMachine):
             else:
                 self.transit_to(self.blink_off)
                 
-        elif kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'}:
-            end_off, total_duration, cycle_duration = kwargs['end_off'], kwargs['total_duration'], kwargs['cycle_duration']
-            
+        elif kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'} or kwargs.keys() == {'end_off', 'total_duration', 'n_cycles'}:
+            cycle_duration = None
+            if kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'}:
+                end_off, total_duration, cycle_duration = kwargs['end_off'], kwargs['total_duration'], kwargs['cycle_duration']
+            else:
+                end_off, total_duration, n_cycles = kwargs['end_off'], kwargs['total_duration'], kwargs['n_cycles']
+                cycle_duration = total_duration / n_cycles
+                
             self.blink_stop_on_to_blink_stop_off_condition.duration = cycle_duration * percent_on
             self.blink_stop_off_to_blink_stop_on_condition.duration = cycle_duration - self.blink_stop_on_to_blink_stop_off_condition.duration
             
             self.blink_stop_begin_total_duration_condition.duration = total_duration
-            # self.blink_stop_off_conditions.add_condition(self.blink_stop_off_total_duration_condition)
-                        
+            # TODO -> Demander au prof a propos de la logique du total duration 
             if begin_on:   
                 self.blink_stop_begin.add_transition(ConditionalTransition(self.blink_stop_on, AlwaysTrueCondition()))
             else:
@@ -196,11 +196,10 @@ class Blinker(FiniteStateMachine):
             self.transit_to(self.blink_stop_begin)
 
             
-        elif kwargs.keys() == {'end_off', 'total_duration', 'n_cycles'}:
-            ...
-            
         elif kwargs.keys() == {'end_off', 'n_cycles', 'cycle_duration'}:
             ...
+            # TODO : Voir si on fait une logique à part pour cette signature ou si on l'intègre dans l'autre d'avant
+            
                 
         
         
@@ -219,7 +218,7 @@ if __name__ == "__main__":
     
     blinker = Blinker(off_state_generator, on_state_generator)
     # blinker.blink(0.5, True, cycle_duration=1.0)
-    blinker.blink(0.5, True, cycle_duration=1.0, total_duration=5.0, end_off=False)
+    blinker.blink(0.5, True, total_duration=5.0, end_off=False, cycle_duration=1.0)
     # blinker.turn_off(duration=2.0)
     for _ in range(10000000):
         blinker.track()
