@@ -172,13 +172,16 @@ class ActionState(State):
         self.__exiting_actions = []
         
     def _do_entering_action(self) -> None:
-        pass
+        for action in self.__entering_actions:
+            action()
     
     def _do_in_state_action(self) -> None:
-        pass
+        for action in self.__in_state_actions:
+            action()
     
     def _do_exiting_action(self) -> None:
-        pass
+        for action in self.__exiting_actions:
+            action()
         
     def add_entering_action(self, action: Action) -> None:    
         if not callable(action):

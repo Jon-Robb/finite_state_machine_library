@@ -1,6 +1,7 @@
 import unittest
 import MyFSM
 from finite_state_machine import FiniteStateMachine, State, Transition
+import Blinker
 # from transition import Transition
 class TestState(unittest.TestCase):
     
@@ -128,6 +129,8 @@ class TestMyFSM(unittest.TestCase):
     def test_applitative_state_is_equal_to_initial_state(self):
         self.assertEqual(self.fsm.current_applicative_state, self.fsm._FiniteStateMachine__layout._Layout__initial_state)
 
+
     
 if __name__ == '__main__':
+    
     unittest.main()
