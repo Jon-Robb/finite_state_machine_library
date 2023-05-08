@@ -170,13 +170,17 @@ class Blinker(FiniteStateMachine):
             else:
                 self.transit_to(self.blink_off)
                 
-        elif kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'} or kwargs.keys() == {'end_off', 'total_duration', 'n_cycles'}:
+        elif kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'} or kwargs.keys() == {'end_off', 'total_duration', 'n_cycles'} or kwargs.keys() == {'end_off', 'n_cycles', 'cycle_duration'}:
             cycle_duration = None
             if kwargs.keys() == {'end_off', 'total_duration', 'cycle_duration'}:
                 end_off, total_duration, cycle_duration = kwargs['end_off'], kwargs['total_duration'], kwargs['cycle_duration']
-            else:
+            elif kwargs.keys() == {'end_off', 'total_duration', 'n_cycles'}:
                 end_off, total_duration, n_cycles = kwargs['end_off'], kwargs['total_duration'], kwargs['n_cycles']
                 cycle_duration = total_duration / n_cycles
+            elif kwargs.keys() == {'end_off', 'n_cycles', 'cycle_duration'}:
+                end_off, n_cycles, cycle_duration = kwargs['end_off'], kwargs['n_cycles'], kwargs['cycle_duration']
+                total_duration = n_cycles * cycle_duration
+                
                 
             self.blink_stop_on_to_blink_stop_off_condition.duration = cycle_duration * percent_on
             self.blink_stop_off_to_blink_stop_on_condition.duration = cycle_duration - self.blink_stop_on_to_blink_stop_off_condition.duration
@@ -196,9 +200,10 @@ class Blinker(FiniteStateMachine):
             self.transit_to(self.blink_stop_begin)
 
             
-        elif kwargs.keys() == {'end_off', 'n_cycles', 'cycle_duration'}:
-            ...
-            # TODO : Voir si on fait une logique à part pour cette signature ou si on l'intègre dans l'autre d'avant
+        # elif kwargs.keys() == {'end_off', 'n_cycles', 'cycle_duration'}:
+        #     ...
+            
+        #     # TODO : Voir si on fait une logique à part pour cette signature ou si on l'intègre dans l'autre d'avant
             
                 
         
@@ -218,7 +223,7 @@ if __name__ == "__main__":
     
     blinker = Blinker(off_state_generator, on_state_generator)
     # blinker.blink(0.5, True, cycle_duration=1.0)
-    blinker.blink(0.5, True, total_duration=5.0, end_off=False, cycle_duration=1.0)
+    blinker.blink(0.5, True, n_cycles=5.0, end_off=False, cycle_duration=2.0)
     # blinker.turn_off(duration=2.0)
     for _ in range(10000000):
         blinker.track()
