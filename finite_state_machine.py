@@ -1,7 +1,8 @@
 from enum import Enum
 import time
+from Condition import Condition, StateEntryDurationCondition
 from state import State
-from transition import Transition
+from transition import MonitoredTransition, Transition
 
 class FiniteStateMachine:
     """
@@ -348,3 +349,9 @@ class FiniteStateMachine:
         """
         if self.__current_operational_state == self.OperationalState.RUNNING:
             self.__current_operational_state = self.OperationalState.IDLE
+            
+    def assemble_state_transitions_and_timed_conditions(self, starting_state: State, finishing_state: State, condition_duration:float=1.0 ) -> Condition :
+        condition = StateEntryDurationCondition(condition_duration, starting_state)
+        transition = MonitoredTransition(finishing_state, condition)
+        starting_state.add_transition(transition)
+        return condition 
