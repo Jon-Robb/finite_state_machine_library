@@ -12,8 +12,8 @@ class FiniteStateMachine:
     -----------
     layout : Layout
         The layout of the finite state machine, containing the states and initial state.
-    uninitialized : bool, optional
-        Whether the operational state of the finite state machine should start as uninitialized (True, default) or idle (False).
+    # uninitialized : bool, optional
+        # Whether the operational state of the finite state machine should start as uninitialized (True, default) or idle (False).
 
     Methods:
     --------
