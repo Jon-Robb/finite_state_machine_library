@@ -234,3 +234,6 @@ class MonitoredState(ActionState):
     def _exec_exiting_action(self) -> None:
         super()._exec_exiting_action()
         self.__counter_last_exit = time.perf_counter()
+        
+class RobotState(MonitoredState):
+    ...

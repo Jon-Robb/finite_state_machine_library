@@ -2,10 +2,10 @@ from side_blinkers import SideBlinkers
 from state import MonitoredState
 from Blinker import Blinker
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from robot import Robot
+from functools import partial
+
 class EyeBlinkers(SideBlinkers):
-    def __init__(self, robot: Robot, left_color:tuple, right_color:tuple) -> None:
+    def __init__(self, robot, left_color:tuple, right_color:tuple) -> None:
         
         if not isinstance(left_color, tuple) or not isinstance(right_color, tuple):
             raise TypeError("left_color and right_color must be tuples")
@@ -18,21 +18,35 @@ class EyeBlinkers(SideBlinkers):
     
         def left_off_state_generator(self):
             state = MonitoredState()
-            state.add_in_state_action(lambda: self.robot.left_eye.off())
+        
+            state.add_entering_action(lambda: robot.close_left_eye())
+            return state
             
         def right_off_state_generator(self):
             state = MonitoredState()
-            state.add_in_state_action(lambda: self.robot.right_eye.off())   
+            state.add_entering_action(lambda: robot.close_right_eye())   
+            return state
+
             
         def left_on_state_generator(self):
             state = MonitoredState()
-            state.add_in_state_action(lambda: self.robot.left_eye.color(self.__left_color))
+            def open_left_eye(color):
+                robot.set_left_eye_color(color)
+                robot.open_left_eye()
+                
+            state.add_entering_action(partial(open_left_eye, left_color))
+            return state
         
         def right_on_state_generator(self):
             state = MonitoredState()
-            state.add_in_state_action(lambda: self.robot.right_eye.color(self.__right_color)) 
+            def open_right_eye(color):
+                robot.set_right_eye_color(color)
+                robot.open_right_eye()
                 
-        super.__init__(left_off_state_generator, left_on_state_generator, right_off_state_generator, right_on_state_generator)
+            state.add_entering_action(partial(open_right_eye, right_color)) 
+            return state
+                
+        super().__init__(left_off_state_generator, left_on_state_generator, right_off_state_generator, right_on_state_generator)
        
     @property
     def left_color(self) -> tuple:

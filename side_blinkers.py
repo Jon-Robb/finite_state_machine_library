@@ -80,11 +80,11 @@ class SideBlinkers:
             self.right_blinker.blink(**kwargs)
         elif side == self.Side.LEFT_RECIPROCAL:
             self.left_blinker.blink(**kwargs)
-            kwargs.set("begin_on", not kwargs.get("begin_on"))
+            kwargs["begin_on"] = not kwargs.get("begin_on")
             self.right_blinker.blink(**kwargs)
         elif side == self.Side.RIGHT_RECIPROCAL:
             self.right_blinker.blink(**kwargs)
-            kwargs.set("begin_on", not kwargs.get("begin_on"))
+            kwargs["begin_on"] = not kwargs.get("begin_on")
             self.left_blinker.blink(**kwargs)
         else:
             raise Exception("Side must be LEFT, RIGHT, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL")

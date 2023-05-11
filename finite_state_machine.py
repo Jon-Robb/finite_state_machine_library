@@ -126,7 +126,7 @@ class FiniteStateMachine:
                 raise Exception("state is already in self.__states")
             self.__states.append(state)
             
-        def add_states(self, states:list[State]) -> None:
+        def add_states(self, states) -> None:
             """
             Adds the given list of states to the list of states in the finite state machine.
 

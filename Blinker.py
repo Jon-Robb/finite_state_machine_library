@@ -28,19 +28,19 @@ class Blinker(FiniteStateMachine):
         
         # self.off = assemble_state_transitions_and_conditions()
         # 1-Create states and their custom fields
-        self.off = off_state_generator()
+        self.off = off_state_generator(self)
         self.off._FSM_BLINKER_ON_STATE = False
         self.off.add_in_state_action(lambda: print('In Blinker Off State'))
         
-        self.on = on_state_generator()
+        self.on = on_state_generator(self)
         self.on._FSM_BLINKER_ON_STATE = True
         self.on.add_in_state_action(lambda: print('In Blinker On State'))
 
-        self.blink_on = on_state_generator()
+        self.blink_on = on_state_generator(self)
         self.blink_on._FSM_BLINKER_ON_STATE = True
         self.blink_on.add_in_state_action(lambda: print("Blink On"))
 
-        self.blink_off = off_state_generator()
+        self.blink_off = off_state_generator(self)
         self.blink_off._FSM_BLINKER_ON_STATE = False
         self.blink_off.add_in_state_action(lambda: print("Blink Off"))
         
@@ -53,19 +53,19 @@ class Blinker(FiniteStateMachine):
         self.blink_stop_end = MonitoredState()
         self.blink_stop_end._FSM_BLINKER_ON_STATE = None
         
-        self.off_duration = off_state_generator()
+        self.off_duration = off_state_generator(self)
         self.off_duration._FSM_BLINKER_ON_STATE = False
         self.off_duration.add_in_state_action(lambda: print("In off duration"))
         
-        self.on_duration = on_state_generator()
+        self.on_duration = on_state_generator(self)
         self.on_duration._FSM_BLINKER_ON_STATE = True
         self.on_duration.add_in_state_action(lambda: print("In on duration"))
         
-        self.blink_stop_off = off_state_generator()
+        self.blink_stop_off = off_state_generator(self)
         self.blink_stop_off._FSM_BLINKER_ON_STATE = False
         self.blink_stop_off.add_in_state_action(lambda: print("Blink Stop Off"))
         
-        self.blink_stop_on = on_state_generator()
+        self.blink_stop_on = on_state_generator(self)
         self.blink_stop_on._FSM_BLINKER_ON_STATE = True
         self.blink_stop_on.add_in_state_action(lambda: print("Blink Stop On"))
         
