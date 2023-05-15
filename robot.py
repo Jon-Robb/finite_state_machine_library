@@ -6,16 +6,30 @@ from manual_control import ManualControl
 
 class Robot:
     def __init__(self) -> None:
-        self.brain = gpg.EasyGoPiGo3()
+      
+        self.success_brain_implement = None
+        self.success_auxiliary_implement = None
+        try:
+            self.brain = gpg.EasyGoPiGo3()
+            self.state_machines["led_blinkers"] = LedBlinkers(self.brain)
+            self.state_machines["eye_blinkers"] = EyeBlinkers(self.brain, (255,0,0), (0,0,255))
+            self.success_brain_implement = True
+        except:
+            print("Failed to instantiate from the GoPiGo3 library")
+            self.success_brain_implement = False
         
         remote_control_port = 'AD1'
-        
-        self.remote = self.brain.init_remote(port=remote_control_port)
+    
         self.remote_input = None
         self.state_machines = {}
         
-        self.state_machines["led_blinkers"] = LedBlinkers(self.brain)
-        self.state_machines["eye_blinkers"] = EyeBlinkers(self.brain, (255,0,0), (0,0,255))
+        try:
+            self.remote = self.brain.init_remote(port=remote_control_port)
+            
+            self.success_auxiliary_implement = True
+        except :
+            self.success_auxiliary_implement = False
+            print("Failed to instantiate from the Remote Control library and etc.")
         self.state_machines["manual_control"] = ManualControl(self)
         
     def start(self):
