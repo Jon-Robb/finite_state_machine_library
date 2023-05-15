@@ -5,13 +5,7 @@ from Condition import Condition, StateEntryDurationCondition, StateEntryCountCon
 from finite_state_machine import FiniteStateMachine
 from state import MonitoredState, State
 from transition import ConditionalTransition, MonitoredTransition, Transition
-
-
-def assemble_state_transitions_and_timed_conditions(starting_state: State, finishing_state: State, condition_duration:float=1.0 ) -> Condition :
-    condition = StateEntryDurationCondition(condition_duration, starting_state)
-    transition = MonitoredTransition(finishing_state, condition)
-    starting_state.add_transition(transition)
-    return condition 
+from assembling_functions import assemble_state_transitions_and_timed_conditions
 
 
 class Blinker(FiniteStateMachine):
@@ -83,18 +77,18 @@ class Blinker(FiniteStateMachine):
 
     
         
-        self.on_duration_condition = self.assemble_state_transitions_and_timed_conditions(self.on_duration, self.off_duration)
-        self.off_duration_condition = self.assemble_state_transitions_and_timed_conditions(self.off_duration, self.on_duration)
+        self.on_duration_condition = assemble_state_transitions_and_timed_conditions(self.on_duration, self.off_duration)
+        self.off_duration_condition = assemble_state_transitions_and_timed_conditions(self.off_duration, self.on_duration)
     
-        self.blink_off_condition = self.assemble_state_transitions_and_timed_conditions(self.blink_off, self.blink_on)
-        self.blink_on_condition = self.assemble_state_transitions_and_timed_conditions(self.blink_on, self.blink_off)
+        self.blink_off_condition = assemble_state_transitions_and_timed_conditions(self.blink_off, self.blink_on)
+        self.blink_on_condition = assemble_state_transitions_and_timed_conditions(self.blink_on, self.blink_off)
     
-        self.blink_stop_on_to_blink_stop_off_condition = self.assemble_state_transitions_and_timed_conditions(self.blink_stop_on, self.blink_stop_off)
-        self.blink_stop_off_to_blink_stop_on_condition = self.assemble_state_transitions_and_timed_conditions(self.blink_stop_off, self.blink_stop_on)
+        self.blink_stop_on_to_blink_stop_off_condition = assemble_state_transitions_and_timed_conditions(self.blink_stop_on, self.blink_stop_off)
+        self.blink_stop_off_to_blink_stop_on_condition = assemble_state_transitions_and_timed_conditions(self.blink_stop_off, self.blink_stop_on)
         
         # self.blink_stop_on_or_off_to_blink_stop_end_condition = assemble_state_transitions_and_timed_conditions(self.blink_stop_off, self.blink_stop_end)
         # self.blink_stop_on_or_off_to_blink_stop_end_condition = assemble_state_transitions_and_timed_conditions(self.blink_stop_on, self.blink_stop_end)
-        self.blink_stop_begin_total_duration_condition = self.assemble_state_transitions_and_timed_conditions(self.blink_stop_begin, self.blink_stop_end)
+        self.blink_stop_begin_total_duration_condition = assemble_state_transitions_and_timed_conditions(self.blink_stop_begin, self.blink_stop_end)
 
 
         # 5-Create layout
