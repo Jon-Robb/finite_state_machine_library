@@ -53,7 +53,7 @@ class ConditionalTransition(Transition):
     @property
     def is_transiting(self)->bool:
         if self.__condition is not None:
-            return self.__condition._compare()
+            return bool(self.__condition)
         raise Exception("Condition is not set")        
 
 class ActionTransition(ConditionalTransition):

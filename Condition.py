@@ -56,7 +56,6 @@ class AlwaysTrueCondition(Condition):
         return True
 
 class ValueCondition(Condition):
-    # TODO : Ask JC is this is good
     def __init__(self, initial_value: any, expected_value: any, inverse:bool=False):
         super().__init__(inverse)
         self.value = initial_value
@@ -159,6 +158,21 @@ class StateValueCondition(MonitoredStateCondition):
     def __init__(self, expected_value: any, monitored_state:"MonitoredState", inverse:bool=False):
         super().__init__(monitored_state, inverse)
         self.expected_value = expected_value
-    
+        
     def _compare(self)->bool:
         return self.monitored_state.value == self.expected_value
+    
+class RemoteValueCondition(Condition):
+    def __init__(self, remote, expected_input, inverse=False):
+        super().__init__(inverse=inverse)
+        self.remote = remote
+        self.expected_input = expected_input
+        self.last_input = None
+        
+    def _compare(self) -> bool:
+        current_input = self.remote.read()
+        # if self.last_input != current_input:
+        print(current_input)
+            # self.last_input = current_input
+        return current_input == self.expected_input
+        # return False
