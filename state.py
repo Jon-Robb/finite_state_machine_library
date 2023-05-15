@@ -2,6 +2,7 @@
 #if TYPE_CHECKING:
 import time
 from typing import Callable, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from transition import Transition
 
@@ -236,4 +237,7 @@ class MonitoredState(ActionState):
         self.__counter_last_exit = time.perf_counter()
         
 class RobotState(MonitoredState):
-    ...
+    def __init__(self, robot, parameters=State.Parameters()) -> None:
+        super().__init__(parameters)
+        self.robot = robot
+        

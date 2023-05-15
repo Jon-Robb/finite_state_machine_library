@@ -14,8 +14,8 @@ class EyeBlinkers(SideBlinkers):
         if len(left_color) != 3 or len(right_color) != 3:
             raise ValueError("left_color and right_color must be tuples of length 3")
         
-        self.__left_color = Color(left_color[0], left_color[1], left_color[2])
-        self.__right_color = Color(right_color[0], right_color[1], right_color[2])
+        self.__left_color = Color(left_color)
+        self.__right_color = Color(right_color)
     
         def left_off_state_generator(self):
             state = MonitoredState()
@@ -32,7 +32,7 @@ class EyeBlinkers(SideBlinkers):
         def left_on_state_generator(self):
             state = MonitoredState()
             def open_left_eye(color):
-                robot.set_left_eye_color(Color(color[0], color[1], color[2]))
+                robot.set_left_eye_color(color)
                 robot.open_left_eye()
                 
             state.add_entering_action(partial(open_left_eye, left_color))
@@ -41,7 +41,7 @@ class EyeBlinkers(SideBlinkers):
         def right_on_state_generator(self):
             state = MonitoredState()
             def open_right_eye(color):
-                robot.set_right_eye_color(right_color((color[0], color[1], color[2])))
+                robot.set_right_eye_color(color)
                 robot.open_right_eye()
                 
             state.add_entering_action(partial(open_right_eye, right_color)) 
@@ -58,11 +58,11 @@ class EyeBlinkers(SideBlinkers):
     
     @left_color.setter 
     def left_color(self, color: tuple) -> None:
-        self.__left_color(color[0], color[1], color[2])
+        self.__left_color = color
         
     @right_color.setter 
     def right_color(self, color: tuple) -> None:
-        self.__right_color(color[0], color[1], color[2])
+        self.__right_color = color
         
     def change_eyes_colors(self, both_colors: tuple=None ) -> None:
         if both_colors is None:
@@ -74,5 +74,5 @@ class EyeBlinkers(SideBlinkers):
         if len(both_colors) != 3:
             raise ValueError("left_color and right_color must be tuples of length 3")
         
-        self.right_color(both_colors[0], both_colors[1], both_colors[2])
-        self.left_color(both_colors[0], both_colors[1], both_colors[2])
+        self.right_color = both_colors
+        self.left_color = both_colors

@@ -24,19 +24,19 @@ class Blinker(FiniteStateMachine):
         # 1-Create states and their custom fields
         self.off = off_state_generator(self)
         self.off._FSM_BLINKER_ON_STATE = False
-        self.off.add_in_state_action(lambda: print('In Blinker Off State'))
+    
         
         self.on = on_state_generator(self)
         self.on._FSM_BLINKER_ON_STATE = True
-        self.on.add_in_state_action(lambda: print('In Blinker On State'))
+
 
         self.blink_on = on_state_generator(self)
         self.blink_on._FSM_BLINKER_ON_STATE = True
-        self.blink_on.add_in_state_action(lambda: print("Blink On"))
+
 
         self.blink_off = off_state_generator(self)
         self.blink_off._FSM_BLINKER_ON_STATE = False
-        self.blink_off.add_in_state_action(lambda: print("Blink Off"))
+
         
         self.blink_begin = MonitoredState()
         self.blink_begin._FSM_BLINKER_ON_STATE = None
@@ -49,19 +49,18 @@ class Blinker(FiniteStateMachine):
         
         self.off_duration = off_state_generator(self)
         self.off_duration._FSM_BLINKER_ON_STATE = False
-        self.off_duration.add_in_state_action(lambda: print("In off duration"))
-        
+                
         self.on_duration = on_state_generator(self)
         self.on_duration._FSM_BLINKER_ON_STATE = True
-        self.on_duration.add_in_state_action(lambda: print("In on duration"))
+
         
         self.blink_stop_off = off_state_generator(self)
         self.blink_stop_off._FSM_BLINKER_ON_STATE = False
-        self.blink_stop_off.add_in_state_action(lambda: print("Blink Stop Off"))
+    
         
         self.blink_stop_on = on_state_generator(self)
         self.blink_stop_on._FSM_BLINKER_ON_STATE = True
-        self.blink_stop_on.add_in_state_action(lambda: print("Blink Stop On"))
+
         
       
         blink_stop_off_to_blink_stop_end_n_cycles_condition = StateEntryCountCondition(1.0, self.blink_stop_off)
