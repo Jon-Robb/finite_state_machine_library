@@ -241,3 +241,22 @@ class RobotState(MonitoredState):
         super().__init__(parameters)
         self.robot = robot
         
+        
+class FSMState(RobotState):
+    def __init__(self, robot, fsm, parameters=State.Parameters()) -> None:
+        super().__init__(robot, parameters)
+        self.fsm = fsm
+        
+        def change_active():
+            if self.robot.active_state_machine is self.fsm: 
+                self.robot.active_state_machine = None
+            else:
+                self.robot.active_state_machine = self.fsm
+        
+        self.add_entering_action(change_active)
+        self.add_exiting_action(change_active)
+        self.add_entering_action(lambda: print(f"Entré dans le finite state machine {self.robot.active_state_machine} "))
+
+        
+        
+        
